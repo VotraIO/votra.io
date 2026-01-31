@@ -1,0 +1,67 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-lint
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff pylint mypy black isort
+    
+    - name: Run ruff
+      run: |
+        if [ -d app ]; then
+          ruff check app/ --output-format=github
+        else
+          echo "No app directory found, skipping ruff"
+        fi
+    
+    - name: Run pylint
+      continue-on-error: true
+      run: |
+        if [ -d app ]; then
+          pylint app/ --output-format=colorized
+        else
+          echo "No app directory found, skipping pylint"
+        fi
+    
+    - name: Run mypy
+      continue-on-error: true
+      run: |
+        if [ -d app ]; then
+          mypy app/ --show-error-codes
+        else
+          echo "No app directory found, skipping mypy"
+        fi
+    
+    - name: Check formatting with black
+      run: |
+        black --check . || (echo "Code is not formatted. Run 'black .' to fix." && exit 1)
+    
+    - name: Check import sorting
+      run: |
+        isort --check-only . || (echo "Imports are not sorted. Run 'isort .' to fix." && exit 1)

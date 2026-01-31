@@ -1,0 +1,29 @@
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.12.0
+
+# Code Formatting
+black>=23.12.0
+isort>=5.13.0
+
+# Linting
+ruff>=0.1.9
+pylint>=3.0.0
+
+# Type Checking
+mypy>=1.8.0
+
+# Security Scanning
+bandit[toml]>=1.7.5
+safety>=2.3.5
+
+# Development Tools
+pre-commit>=3.6.0
+ipython>=8.19.0
+ipdb>=0.13.13
+
+# Documentation (optional)
+# mkdocs>=1.5.3
+# mkdocs-material>=9.5.3
