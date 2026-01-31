@@ -329,12 +329,6 @@ jobs:
           safety-report.json
     
     - name: CodeQL Analysis
-      uses: github/codeql-action/init@v3
-      with:
-        languages: python
-        queries: security-and-quality
-    
-    - name: CodeQL Analysis
       uses: github/codeql-action/analyze@v3
 ```
 
