@@ -166,7 +166,7 @@ jobs:
         fi
     
     - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.11' && hashFiles('coverage.xml') != ''
+      if: success() && matrix.python-version == '3.11'
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
@@ -174,7 +174,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
     
     - name: Upload coverage reports
-      if: matrix.python-version == '3.11' && hashFiles('coverage.xml') != ''
+      if: success() && matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
@@ -278,6 +278,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python
+        queries: security-and-quality
+    
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -322,7 +328,7 @@ jobs:
           bandit-report.json
           safety-report.json
     
-    - name: Initialize CodeQL
+    - name: CodeQL Analysis
       uses: github/codeql-action/init@v3
       with:
         languages: python
