@@ -109,8 +109,19 @@ The project includes automated GitHub Actions workflows:
 - **Tests** (`test.yml`): Runs pytest with coverage on Python 3.10, 3.11, 3.12
 - **Lint** (`lint.yml`): Checks code quality with ruff, mypy, pylint, black, isort
 - **Security** (`security.yml`): Scans for vulnerabilities with bandit, safety, CodeQL
+- **Semantic Version** (`semantic-version.yml`): Automatically tags releases based on commit messages
 
 All checks must pass before code can be merged to main/develop branches.
+
+### Semantic Versioning
+
+This project uses automated semantic versioning. When you push to `main`, the version is automatically determined from your commit messages using [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` → Minor version bump (0.X.0)
+- `fix:`, `security:`, `perf:` → Patch version bump (0.0.X)
+- `feat!:` or `BREAKING CHANGE:` → Major version bump (X.0.0)
+
+See [`.github/SEMANTIC_VERSIONING.md`](.github/SEMANTIC_VERSIONING.md) for detailed usage.
 
 ## Project Structure
 

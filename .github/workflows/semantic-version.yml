@@ -1,0 +1,115 @@
+name: Semantic Version & Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  semantic-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for semantic versioning
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install semantic-release
+      run: |
+        npm install -g semantic-release@23 \
+          @semantic-release/git@10 \
+          @semantic-release/changelog@6 \
+          @semantic-release/github@10 \
+          conventional-changelog-conventionalcommits@7
+    
+    - name: Create semantic-release config
+      run: |
+        cat > .releaserc.json << 'EOF'
+        {
+          "branches": ["main"],
+          "plugins": [
+            [
+              "@semantic-release/commit-analyzer",
+              {
+                "preset": "conventionalcommits",
+                "releaseRules": [
+                  {"type": "feat", "release": "minor"},
+                  {"type": "fix", "release": "patch"},
+                  {"type": "perf", "release": "patch"},
+                  {"type": "revert", "release": "patch"},
+                  {"type": "docs", "release": "patch"},
+                  {"type": "style", "release": "patch"},
+                  {"type": "refactor", "release": "patch"},
+                  {"type": "test", "release": "patch"},
+                  {"type": "build", "release": "patch"},
+                  {"type": "ci", "release": "patch"},
+                  {"type": "chore", "release": false},
+                  {"breaking": true, "release": "major"}
+                ]
+              }
+            ],
+            [
+              "@semantic-release/release-notes-generator",
+              {
+                "preset": "conventionalcommits",
+                "presetConfig": {
+                  "types": [
+                    {"type": "feat", "section": "✨ Features"},
+                    {"type": "fix", "section": "🐛 Bug Fixes"},
+                    {"type": "perf", "section": "⚡ Performance Improvements"},
+                    {"type": "revert", "section": "⏪ Reverts"},
+                    {"type": "docs", "section": "📚 Documentation"},
+                    {"type": "style", "section": "💎 Styles"},
+                    {"type": "refactor", "section": "♻️ Code Refactoring"},
+                    {"type": "test", "section": "✅ Tests"},
+                    {"type": "build", "section": "🔧 Build System"},
+                    {"type": "ci", "section": "👷 CI/CD"},
+                    {"type": "security", "section": "🔒 Security"}
+                  ]
+                }
+              }
+            ],
+            [
+              "@semantic-release/changelog",
+              {
+                "changelogFile": "CHANGELOG.md"
+              }
+            ],
+            [
+              "@semantic-release/github",
+              {
+                "successComment": "🎉 This ${issue.pull_request ? 'PR is included' : 'issue has been resolved'} in version ${nextRelease.version}",
+                "labels": ["released"],
+                "releasedLabels": ["released<%= nextRelease.channel ? `-${nextRelease.channel}` : '' %>@<%= nextRelease.gitTag %>"]
+              }
+            ],
+            [
+              "@semantic-release/git",
+              {
+                "assets": ["CHANGELOG.md", "pyproject.toml"],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+              }
+            ]
+          ]
+        }
+        EOF
+    
+    - name: Run semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIT_AUTHOR_NAME: "github-actions[bot]"
+        GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+        GIT_COMMITTER_NAME: "github-actions[bot]"
+        GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
+      run: npx semantic-release
