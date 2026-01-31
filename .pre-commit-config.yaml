@@ -46,7 +46,6 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [pydantic>=2.0, types-requests]
-        args: [--ignore-missing-imports]
 
   # Security scanning with bandit
   - repo: https://github.com/PyCQA/bandit

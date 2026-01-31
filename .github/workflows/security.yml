@@ -20,6 +20,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python
+        queries: security-and-quality
+    
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -66,6 +72,3 @@ jobs:
     
     - name: CodeQL Analysis
       uses: github/codeql-action/analyze@v3
-      with:
-        languages: python
-        queries: security-and-quality

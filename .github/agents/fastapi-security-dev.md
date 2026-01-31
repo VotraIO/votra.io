@@ -135,28 +135,52 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
     
     - name: Run tests with coverage
       run: |
-        pytest --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+        if [ -d tests ]; then
+          pytest --cov=app --cov-report=xml --cov-report=term-missing --cov-fail-under=80
+        else
+          echo "No tests directory found, skipping tests"
+        fi
     
     - name: Upload coverage to Codecov
+      if: success() && matrix.python-version == '3.11'
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+    
+    - name: Upload coverage reports
+      if: success() && matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          coverage.xml
+          htmlcov/
 ```
 
 ##### `lint.yml` - Linting Workflow
@@ -174,32 +198,60 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
     
-    - name: Install dependencies
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-lint
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install linting tools
       run: |
         python -m pip install --upgrade pip
         pip install ruff pylint mypy black isort
     
     - name: Run ruff
-      run: ruff check .
+      run: |
+        if [ -d app ]; then
+          ruff check app/ --output-format=github
+        else
+          echo "No app directory found, skipping ruff"
+        fi
     
     - name: Run pylint
-      run: pylint app/
+      continue-on-error: true
+      run: |
+        if [ -d app ]; then
+          pylint app/ --output-format=colorized
+        else
+          echo "No app directory found, skipping pylint"
+        fi
     
     - name: Run mypy
-      run: mypy app/
+      continue-on-error: true
+      run: |
+        if [ -d app ]; then
+          mypy app/ --show-error-codes
+        else
+          echo "No app directory found, skipping mypy"
+        fi
     
     - name: Check formatting with black
-      run: black --check .
+      run: |
+        black --check . || (echo "Code is not formatted. Run 'black .' to fix." && exit 1)
     
     - name: Check import sorting
-      run: isort --check-only .
+      run: |
+        isort --check-only . || (echo "Imports are not sorted. Run 'isort .' to fix." && exit 1)
 ```
 
 ##### `security.yml` - Security Scanning Workflow
@@ -212,38 +264,72 @@ on:
   pull_request:
     branches: [ main, develop ]
   schedule:
-    - cron: '0 0 * * 0'  # Weekly scan
+    # Run security scans every Sunday at midnight UTC
+    - cron: '0 0 * * 0'
 
 jobs:
   security:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python
+        queries: security-and-quality
     
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
     
-    - name: Install dependencies
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-security
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install security tools
       run: |
         python -m pip install --upgrade pip
-        pip install bandit safety
-        pip install -r requirements.txt
+        pip install bandit[toml] safety
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     
     - name: Run bandit security scan
-      run: bandit -r app/ -f json -o bandit-report.json
+      continue-on-error: true
+      run: |
+        if [ -d app ]; then
+          bandit -r app/ -f json -o bandit-report.json
+          bandit -r app/ -f screen
+        else
+          echo "No app directory found, skipping bandit"
+        fi
     
-    - name: Run safety check
-      run: safety check --json
+    - name: Run safety check for dependency vulnerabilities
+      continue-on-error: true
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check || true
     
-    - name: Upload bandit results
+    - name: Upload security reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: bandit-report
-        path: bandit-report.json
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+    
+    - name: CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
 ```
 
 ##### `format.yml` - Auto-format Workflow (Optional)
@@ -327,10 +413,17 @@ Common secrets for FastAPI applications:
 ```python
 # app/config.py
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from functools import lru_cache
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False
+    )
     
     # Application
     app_name: str = "Votra.io API"
@@ -346,11 +439,6 @@ class Settings(BaseSettings):
     
     # CORS
     cors_origins: list[str] = ["https://votra.io", "https://dev.votra.io"]
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
 
 @lru_cache()
 def get_settings() -> Settings:
@@ -481,7 +569,7 @@ def get_password_hash(password: str) -> str:
 
 #### JWT Authentication
 ```python
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -492,9 +580,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     """Create a JWT access token."""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -533,7 +621,7 @@ async def rate_limited_endpoint(request: Request):
 
 #### Input Validation
 ```python
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 class UserCreate(BaseModel):
@@ -542,7 +630,8 @@ class UserCreate(BaseModel):
     email: str = Field(..., max_length=255)
     password: str = Field(..., min_length=8, max_length=100)
     
-    @validator('email')
+    @field_validator('email')
+    @classmethod
     def email_must_be_valid(cls, v):
         """Validate email format."""
         import re
@@ -550,7 +639,8 @@ class UserCreate(BaseModel):
             raise ValueError('Invalid email format')
         return v.lower()
     
-    @validator('password')
+    @field_validator('password')
+    @classmethod
     def password_strength(cls, v):
         """Validate password strength."""
         if not any(char.isdigit() for char in v):
