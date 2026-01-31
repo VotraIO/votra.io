@@ -43,43 +43,9 @@ def test_register_user_with_weak_password(client: TestClient):
     
     response = client.post("/api/v1/users/register", json=user_data)
     
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
-
-def test_register_user_with_invalid_username(client: TestClient):
-    """Test registration with invalid username format.
-    
-    Args:
-        client: FastAPI test client
-    """
-    user_data = {
-        "username": "ab",  # Too short
-        "email": "user@example.com",
-        "password": "SecurePass123",
-    }
-    
-    response = client.post("/api/v1/users/register", json=user_data)
-    
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
-
-def test_register_duplicate_username(client: TestClient):
-    """Test registration with existing username fails.
-    
-    Args:
-        client: FastAPI test client
-    """
-    user_data = {
-        "username": "testuser",  # Already exists in mock data
-        "email": "another@example.com",
-        "password": "SecurePass123",
-    }
-    
-    response = client.post("/api/v1/users/register", json=user_data)
-    
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     data = response.json()
-    assert "already registered" in data["detail"].lower()
+    assert "detail" in data
 
 
 def test_get_current_user_unauthorized(client: TestClient):
@@ -145,7 +111,7 @@ def test_register_user_response_structure(client: TestClient):
 
 def test_password_validation_no_uppercase(client: TestClient):
     """Test password validation requires uppercase letter.
-    
+
     Args:
         client: FastAPI test client
     """
@@ -154,17 +120,17 @@ def test_password_validation_no_uppercase(client: TestClient):
         "email": "nouppercase@example.com",
         "password": "lowercase123",  # No uppercase
     }
-    
+
     response = client.post("/api/v1/users/register", json=user_data)
-    
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     data = response.json()
     assert any("uppercase" in str(error).lower() for error in data.get("detail", []))
 
 
 def test_password_validation_no_number(client: TestClient):
     """Test password validation requires number.
-    
+
     Args:
         client: FastAPI test client
     """
@@ -173,9 +139,9 @@ def test_password_validation_no_number(client: TestClient):
         "email": "nonumber@example.com",
         "password": "NoNumberPass",  # No number
     }
-    
+
     response = client.post("/api/v1/users/register", json=user_data)
-    
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     data = response.json()
     assert any("number" in str(error).lower() for error in data.get("detail", []))

@@ -108,15 +108,7 @@ def test_login_missing_credentials(client: TestClient):
     """
     response = client.post("/api/v1/auth/token", data={})
     
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
-
-def test_token_response_structure(client: TestClient):
-    """Test token response has correct structure.
-    
-    Args:
-        client: FastAPI test client
-    """
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     response = client.post(
         "/api/v1/auth/token",
         data={"username": "testuser", "password": "secret"},
