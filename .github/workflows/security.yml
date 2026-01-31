@@ -64,8 +64,11 @@ jobs:
           bandit-report.json
           safety-report.json
     
-    - name: CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
       with:
         languages: python
         queries: security-and-quality
+    
+    - name: CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
