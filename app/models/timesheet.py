@@ -13,18 +13,8 @@ class TimesheetBase(BaseModel):
     work_date: date
     hours_logged: Decimal = Field(..., gt=0, le=24, decimal_places=2)
     billing_rate: Decimal = Field(..., gt=0, decimal_places=2)
-    billable_amount: Decimal = Field(..., ge=0, decimal_places=2)
     is_billable: bool = Field(default=True)
     notes: str | None = Field(None, max_length=2000)
-    status: str = Field(..., min_length=1, max_length=50)
-
-    @field_validator("billable_amount")
-    @classmethod
-    def validate_billable_amount(cls, v: Decimal) -> Decimal:
-        """Ensure billable amount is not negative."""
-        if v < 0:
-            raise ValueError("billable_amount must be >= 0")
-        return v
 
 
 class TimesheetCreate(TimesheetBase):
@@ -37,19 +27,25 @@ class TimesheetUpdate(BaseModel):
     work_date: date | None = None
     hours_logged: Decimal | None = Field(None, gt=0, le=24, decimal_places=2)
     billing_rate: Decimal | None = Field(None, gt=0, decimal_places=2)
-    billable_amount: Decimal | None = Field(None, ge=0, decimal_places=2)
     is_billable: bool | None = None
     notes: str | None = Field(None, max_length=2000)
-    status: str | None = Field(None, min_length=1, max_length=50)
 
 
-class TimesheetResponse(TimesheetBase):
+class TimesheetResponse(BaseModel):
     """Timesheet response model."""
 
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    project_id: int
     consultant_id: int
+    work_date: date
+    hours_logged: Decimal
+    billing_rate: Decimal
+    billable_amount: Decimal
+    is_billable: bool
+    notes: str | None = None
+    status: str
     invoice_id: int | None = None
     submitted_at: datetime | None = None
     approved_by: int | None = None

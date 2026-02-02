@@ -13,7 +13,7 @@ from slowapi.errors import RateLimitExceeded
 from app.config import get_settings
 from app.database.base import Base, engine
 from app.limiter import limiter
-from app.routers import auth, clients, health, projects, sows, users
+from app.routers import auth, clients, health, projects, sows, timesheets, users
 
 settings = get_settings()
 
@@ -88,6 +88,7 @@ app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(clients.router, tags=["Clients"])
 app.include_router(sows.router, tags=["SOWs"])
 app.include_router(projects.router, tags=["Projects"])
+app.include_router(timesheets.router, tags=["Timesheets"])
 
 
 # Global exception handler
