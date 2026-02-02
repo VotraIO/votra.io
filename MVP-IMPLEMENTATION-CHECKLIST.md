@@ -85,17 +85,17 @@
 - **Files**: `app/utils/security.py`
 - **Validation**: Passwords hash correctly and verify works
 
-**[ ] Task 2.3: Implement JWT Token Management**
-- [ ] Update `app/utils/security.py`:
-  - [ ] Add `create_access_token()` function
-  - [ ] Add `verify_token()` function
-  - [ ] Add token expiration handling
-  - [ ] Add refresh token support
-- [ ] Add token configuration to `app/config.py`:
-  - [ ] `access_token_expire_minutes` (default 30)
-  - [ ] `refresh_token_expire_days` (default 7)
-  - [ ] `algorithm` (HS256)
-- [ ] Test token creation and validation
+**[x] Task 2.3: Implement JWT Token Management**
+- [x] Update `app/utils/security.py`:
+  - [x] Add `create_access_token()` function
+  - [x] Add `decode_token()` function (replaces verify_token)
+  - [x] Add token expiration handling
+  - [x] Add refresh token support
+- [x] Add token configuration to `app/config.py`:
+  - [x] `access_token_expire_minutes` (default 30)
+  - [x] `refresh_token_expire_days` (default 7)
+  - [x] `algorithm` (HS256)
+- [x] Test token creation and validation
 - **Files**: `app/utils/security.py`, `app/config.py`
 - **Validation**: Tokens are created, validated, and expire correctly
 
