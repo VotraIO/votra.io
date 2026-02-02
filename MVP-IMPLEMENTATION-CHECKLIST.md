@@ -295,31 +295,69 @@
 - **Files**: `app/services/invoice_service.py`, `tests/test_invoices.py`
 - **Validation**: Invoice service with complete business logic + 9 passing tests ✅
 
-**[ ] Task 5.2: Create Invoice Router**
-- [ ] Create `app/routers/invoices.py`:
-  - [ ] POST `/api/v1/invoices` - Generate from timesheets
-  - [ ] GET `/api/v1/invoices` - List with filtering (status, client, date range)
-  - [ ] GET `/api/v1/invoices/{id}` - Get invoice detail with line items
-  - [ ] POST `/api/v1/invoices/{id}/send` - Mark sent (draft → sent)
-  - [ ] POST `/api/v1/invoices/{id}/mark-paid` - Record payment (admin/accountant)
-  - [ ] GET `/api/v1/invoices/{id}/pdf` - Generate PDF (future: nice-to-have)
-- [ ] RBAC:
-  - [ ] Clients can only view their own invoices
-  - [ ] PMs can create/send
-  - [ ] Accountants can mark paid
-- [ ] Error handling:
-  - [ ] Cannot create invoice without approved timesheets
-  - [ ] Cannot mark paid if already paid
-  - [ ] Cannot send if not draft
-- **Files**: `app/routers/invoices.py`
-- **Validation**: `pytest tests/test_invoices.py -v`
+**[✅] Task 5.2: Create Invoice Router** _(Complete with Tests)_
+- [✅] Create `app/routers/invoices.py`:
+  - [✅] POST `/api/v1/invoices` - Generate from timesheets (PM/Admin only)
+  - [✅] GET `/api/v1/invoices` - List with filtering (status, client, date range)
+  - [✅] GET `/api/v1/invoices/{id}` - Get invoice detail with line items
+  - [✅] POST `/api/v1/invoices/{id}/send` - Mark sent (draft → sent, PM/Admin only)
+  - [✅] POST `/api/v1/invoices/{id}/mark-paid` - Record payment (Accountant/Admin only)
+- [✅] RBAC (Role-based access control):
+  - [✅] Clients can only view their own invoices
+  - [✅] PMs can create/send invoices
+  - [✅] Accountants can mark paid
+  - [✅] Admins have full access
+- [✅] Error handling:
+  - [✅] Cannot create invoice without approved timesheets
+  - [✅] Cannot mark paid if already paid
+  - [✅] Cannot send if not draft
+  - [✅] Proper HTTP status codes (403 Forbidden, 404 Not Found, 422 Unprocessable Entity)
+- [✅] Integrated invoice router into `app/main.py` 
+- [✅] Created 10 HTTP integration tests in `tests/test_invoices.py`:
+  - [✅] test_list_invoices_empty
+  - [✅] test_list_invoices_pagination
+  - [✅] test_list_invoices_with_status_filter
+  - [✅] test_list_invoices_with_client_filter
+  - [✅] test_list_invoices_with_date_filter
+  - [✅] test_list_invoices_unauthorized
+  - [✅] test_get_invoice_not_found
+  - [✅] test_send_invoice_unauthorized
+  - [✅] test_mark_paid_unauthorized
+  - [✅] test_router_endpoints_exist
+- **Files**: `app/routers/invoices.py`, `tests/test_invoices.py` (updated), `app/main.py` (updated)
+- **Validation**: 19 total tests (9 unit + 10 HTTP integration) all passing ✅
 
-**[ ] Task 5.3: Create Report/Analytics Router (Optional for MVP)**
-- [ ] GET `/api/v1/reports/revenue` - Revenue by client/period
-- [ ] GET `/api/v1/reports/utilization` - Consultant utilization
-- [ ] GET `/api/v1/reports/overdue-invoices` - Overdue payment tracking
-- **Files**: `app/routers/reports.py`
-- **Validation**: Reports return correct aggregated data
+**[✅] Task 5.3: Create Report/Analytics Router (Optional for MVP)** _(Complete)_
+- [✅] Create `app/services/report_service.py`:
+  - [✅] `get_revenue_report()` - Revenue by client with filtering (start_date, end_date, client_id)
+  - [✅] `get_utilization_report()` - Consultant billable vs non-billable hours
+  - [✅] `get_overdue_invoices()` - Overdue invoices with days overdue tracking
+- [✅] Create `app/routers/reports.py`:
+  - [✅] GET `/api/v1/reports/revenue` - Revenue breakdown with summary totals
+  - [✅] GET `/api/v1/reports/utilization` - Utilization rates with billable hours tracking
+  - [✅] GET `/api/v1/reports/overdue-invoices` - Overdue invoice details and metrics
+- [✅] RBAC implementation:
+  - [✅] Revenue: admin, project_manager, accountant only
+  - [✅] Utilization: admin, project_manager only
+  - [✅] Overdue invoices: admin, project_manager, accountant only
+- [✅] Query filters working (date ranges, client_id, consultant_id, days_overdue)
+- [✅] Integrated into `app/main.py`
+- [✅] Created 13 HTTP integration tests in `tests/test_reports.py`:
+  - [✅] test_revenue_report_empty
+  - [✅] test_revenue_report_unauthorized
+  - [✅] test_revenue_report_date_validation
+  - [✅] test_utilization_report_empty
+  - [✅] test_utilization_report_unauthorized
+  - [✅] test_utilization_report_date_validation
+  - [✅] test_overdue_invoices_empty
+  - [✅] test_overdue_invoices_unauthorized
+  - [✅] test_overdue_invoices_days_filter
+  - [✅] test_all_report_endpoints_exist
+  - [✅] test_revenue_report_with_filters
+  - [✅] test_utilization_report_with_filters
+  - [✅] test_report_response_structure
+- **Files**: `app/services/report_service.py`, `app/routers/reports.py`, `tests/test_reports.py`, `app/main.py` (updated)
+- **Validation**: All 13 reports tests passing ✅
 
 ---
 

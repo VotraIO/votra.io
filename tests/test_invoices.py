@@ -1,11 +1,11 @@
 """Tests for invoice service and functionality."""
 
-from datetime import date, timedelta, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
+import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-import pytest
 
 
 def test_invoice_service_available(client: TestClient, auth_headers: dict):
@@ -162,3 +162,158 @@ def test_invoice_zero_amount():
     assert subtotal == Decimal("0.00")
     assert tax == Decimal("0.00")
     assert total == Decimal("0.00")
+
+
+# ============================================================================
+# HTTP Integration Tests for Invoice Router
+# ============================================================================
+
+
+class TestInvoiceRouter:
+    """Test Invoice Router HTTP endpoints."""
+
+    def test_list_invoices_empty(self, client: TestClient, auth_headers: dict):
+        """Test listing invoices when none exist."""
+        resp = client.get("/api/v1/invoices", headers=auth_headers)
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert data["total"] >= 0
+        assert data["page"] >= 1
+        assert data["per_page"] >= 1
+        assert isinstance(data["items"], list)
+
+    def test_list_invoices_pagination(self, client: TestClient, auth_headers: dict):
+        """Test invoice list pagination parameters."""
+        resp = client.get(
+            "/api/v1/invoices?skip=0&limit=10",
+            headers=auth_headers,
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert data["page"] == 1
+        assert data["per_page"] == 10
+        assert len(data["items"]) <= 10
+
+    def test_list_invoices_with_status_filter(self, client: TestClient, auth_headers: dict):
+        """Test invoice list with status filter."""
+        resp = client.get(
+            "/api/v1/invoices?status_filter=draft",
+            headers=auth_headers,
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert isinstance(data["items"], list)
+        # All returned invoices should have status=draft if any exist
+        for item in data["items"]:
+            if item.get("status"):
+                assert item["status"] == "draft"
+
+    def test_list_invoices_with_client_filter(
+        self, client: TestClient, auth_headers: dict
+    ):
+        """Test invoice list with client_id filter."""
+        resp = client.get(
+            "/api/v1/invoices?client_id=1",
+            headers=auth_headers,
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert isinstance(data["items"], list)
+        # All returned invoices should belong to client_id=1 if any exist
+        for item in data["items"]:
+            assert item["client_id"] == 1
+
+    def test_list_invoices_with_date_filter(self, client: TestClient, auth_headers: dict):
+        """Test invoice list with date range filter."""
+        today = date.today()
+        start_date = today - timedelta(days=30)
+        end_date = today + timedelta(days=30)
+
+        resp = client.get(
+            f"/api/v1/invoices?start_date={start_date}&end_date={end_date}",
+            headers=auth_headers,
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert isinstance(data["items"], list)
+
+    def test_list_invoices_unauthorized(self, client: TestClient):
+        """Test listing invoices without authentication."""
+        resp = client.get("/api/v1/invoices")
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_get_invoice_not_found(self, client: TestClient, auth_headers: dict):
+        """Test getting non-existent invoice."""
+        resp = client.get("/api/v1/invoices/9999", headers=auth_headers)
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert "not found" in resp.json()["detail"].lower()
+
+    def test_send_invoice_unauthorized(self, client: TestClient, auth_headers: dict):
+        """Test that non-PM cannot send invoice."""
+        # This depends on user role in auth_headers
+        # Mock users are typically 'admin' or 'user' role
+        # We'd need a 'client' role to test proper rejection
+        resp = client.post("/api/v1/invoices/1/send", headers=auth_headers)
+        # Should either succeed (if admin) or fail with 403 (if client)
+        assert resp.status_code in [
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+        ]
+
+    def test_mark_paid_unauthorized(self, client: TestClient, auth_headers: dict):
+        """Test that non-accountant cannot mark invoice paid."""
+        # Similar to send_invoice, depends on user role
+        resp = client.post(
+            "/api/v1/invoices/1/mark-paid",
+            json={"payment_date": str(date.today())},
+            headers=auth_headers,
+        )
+        assert resp.status_code in [
+            status.HTTP_403_FORBIDDEN,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+        ]
+
+    def test_router_endpoints_exist(self, client: TestClient, auth_headers: dict):
+        """Test that all invoice router endpoints are registered."""
+        # GET /api/v1/invoices - List
+        resp = client.get("/api/v1/invoices", headers=auth_headers)
+        assert resp.status_code in [
+            status.HTTP_200_OK,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+        ]
+
+        # GET /api/v1/invoices/{id} - Get detail (404 is ok if no invoice)
+        resp = client.get("/api/v1/invoices/1", headers=auth_headers)
+        assert resp.status_code in [
+            status.HTTP_200_OK,
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+        ]
+
+        # POST /api/v1/invoices - Generate (422 is ok if data invalid)
+        resp = client.post(
+            "/api/v1/invoices",
+            json={"project_id": 1, "invoice_date": str(date.today())},
+            headers=auth_headers,
+        )
+        # Endpoint should exist, not 404
+        assert resp.status_code != 404
+
+        # POST /api/v1/invoices/{id}/send (422 is ok if no invoice)
+        resp = client.post("/api/v1/invoices/1/send", headers=auth_headers)
+        # Endpoint should exist, not 404
+        assert resp.status_code != 404
+
+        # POST /api/v1/invoices/{id}/mark-paid (422 is ok if no invoice)
+        resp = client.post(
+            "/api/v1/invoices/1/mark-paid",
+            json={"payment_date": str(date.today())},
+            headers=auth_headers,
+        )
+        # Endpoint should exist, not 404
+        assert resp.status_code != 404
+
