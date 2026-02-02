@@ -43,7 +43,7 @@ def test_register_user_with_weak_password(client: TestClient):
     
     response = client.post("/api/v1/users/register", json=user_data)
     
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     data = response.json()
     assert "detail" in data
 
@@ -123,7 +123,7 @@ def test_password_validation_no_uppercase(client: TestClient):
 
     response = client.post("/api/v1/users/register", json=user_data)
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     data = response.json()
     assert any("uppercase" in str(error).lower() for error in data.get("detail", []))
 
@@ -142,6 +142,6 @@ def test_password_validation_no_number(client: TestClient):
 
     response = client.post("/api/v1/users/register", json=user_data)
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     data = response.json()
     assert any("number" in str(error).lower() for error in data.get("detail", []))

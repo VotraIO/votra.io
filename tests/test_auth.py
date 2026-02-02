@@ -102,13 +102,13 @@ def test_refresh_token_endpoint(client: TestClient):
 
 def test_login_missing_credentials(client: TestClient):
     """Test login with missing credentials returns 422.
-    
+
     Args:
         client: FastAPI test client
     """
     response = client.post("/api/v1/auth/token", data={})
-    
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     response = client.post(
         "/api/v1/auth/token",
         data={"username": "testuser", "password": "secret"},

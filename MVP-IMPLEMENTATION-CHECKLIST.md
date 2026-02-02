@@ -61,27 +61,27 @@
 
 ### Week 2: Pydantic Models & Authentication
 
-**[ ] Task 2.1: Create Pydantic Request/Response Models**
-- [ ] `app/models/user.py`: UserCreate, UserUpdate, UserResponse
-- [ ] `app/models/client.py`: ClientCreate, ClientUpdate, ClientResponse, ClientList
-- [ ] `app/models/sow.py`: SOWBase, SOWCreate, SOWUpdate, SOWResponse, SOWList, SOWApprove
-- [ ] `app/models/project.py`: ProjectCreate, ProjectUpdate, ProjectResponse, ProjectList
-- [ ] `app/models/timesheet.py`: TimesheetCreate, TimesheetUpdate, TimesheetResponse, TimesheetList
-- [ ] `app/models/invoice.py`: InvoiceCreate, InvoiceResponse, InvoiceList, PaymentRecord
-- [ ] Add field validators for all models
-- [ ] Add password strength validation (8+ chars, uppercase, lowercase, number)
-- [ ] Add email validation
-- [ ] Add date range validation (end_date > start_date)
-- [ ] Add financial field validation (positive amounts)
+**[x] Task 2.1: Create Pydantic Request/Response Models**
+- [x] `app/models/user.py`: UserCreate, UserUpdate, UserResponse
+- [x] `app/models/client.py`: ClientCreate, ClientUpdate, ClientResponse, ClientList
+- [x] `app/models/sow.py`: SOWBase, SOWCreate, SOWUpdate, SOWResponse, SOWList, SOWApprove
+- [x] `app/models/project.py`: ProjectCreate, ProjectUpdate, ProjectResponse, ProjectList
+- [x] `app/models/timesheet.py`: TimesheetCreate, TimesheetUpdate, TimesheetResponse, TimesheetList
+- [x] `app/models/invoice.py`: InvoiceCreate, InvoiceResponse, InvoiceList, PaymentRecord
+- [x] Add field validators for all models
+- [x] Add password strength validation (8+ chars, uppercase, lowercase, number)
+- [x] Add email validation
+- [x] Add date range validation (end_date > start_date)
+- [x] Add financial field validation (positive amounts)
 - **Files**: `app/models/*.py`
 - **Validation**: `pytest tests/test_models.py -v`
 
-**[ ] Task 2.2: Implement Password Security**
-- [ ] Update `app/utils/security.py`:
-  - [ ] Add `verify_password()` function using bcrypt
-  - [ ] Add `get_password_hash()` function using bcrypt
-  - [ ] Test password hashing works correctly
-- [ ] Update User model to hash passwords on creation
+**[x] Task 2.2: Implement Password Security**
+- [x] Update `app/utils/security.py`:
+  - [x] Add `verify_password()` function using bcrypt
+  - [x] Add `get_password_hash()` function using bcrypt
+  - [x] Test password hashing works correctly
+- [x] Update User model to hash passwords on creation
 - **Files**: `app/utils/security.py`
 - **Validation**: Passwords hash correctly and verify works
 
