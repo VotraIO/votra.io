@@ -13,7 +13,17 @@ from app.models.user import TokenData
 
 settings = get_settings()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Provide a database session dependency.
+
+    Yields:
+        AsyncSession: Database session
+    """
+    async for session in get_db():
+        yield session
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:

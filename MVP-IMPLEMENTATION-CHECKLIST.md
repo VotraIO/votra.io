@@ -50,12 +50,12 @@
 - **Command**: `alembic revision --autogenerate -m "Initial schema"`
 - **Validation**: `alembic upgrade head` completes successfully
 
-**[ ] Task 1.4: Set up Database Connection**
-- [ ] Update `app/database/base.py` with async engine configuration
-- [ ] Add database URL to `app/config.py`
-- [ ] Create async session factory
-- [ ] Add `get_db()` dependency function to `app/dependencies.py`
-- [ ] Test connection on startup
+**[x] Task 1.4: Set up Database Connection**
+- [x] Update `app/database/base.py` with async engine configuration
+- [x] Add database URL to `app/config.py`
+- [x] Create async session factory
+- [x] Add `get_db()` dependency function to `app/dependencies.py`
+- [x] Test connection on startup
 - **Files**: `app/database/base.py`, `app/config.py`, `app/dependencies.py`
 - **Validation**: Server starts without database connection errors
 
