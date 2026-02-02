@@ -200,15 +200,28 @@
 - **Validation**: All 15 SOW tests pass ✅ | Overall: 90 tests passing
 - **Note**: Workflow states enforced: draft → pending → approved/rejected
 
-**[ ] Task 3.3: Add Audit Logging**
-- [ ] Create `app/utils/audit.py`:
-  - [ ] `log_audit()` function to create AuditLog entries
-  - [ ] Track user, action, entity_type, entity_id, timestamp
-  - [ ] Store old/new values for updates
-- [ ] Add audit logging to SOW state changes
-- [ ] Add audit logging to all financial operations
-- **Files**: `app/utils/audit.py`
-- **Validation**: Audit logs created for all state transitions
+**[✅] Task 3.3: Add Audit Logging** _(Completed 2026-02-03)_
+- [✅] Create `app/utils/audit.py`:
+  - [✅] `log_audit()` function to create AuditLog entries
+  - [✅] Track user, action, entity_type, entity_id, timestamp
+  - [✅] Store old/new values for updates (JSON serialization)
+  - [✅] `get_audit_logs()` function for retrieval with filtering
+  - [✅] `parse_audit_values()` helper for JSON deserialization
+- [✅] Add audit logging to SOW state changes:
+  - [✅] `create_sow()` - logs creation with new values
+  - [✅] `submit_sow()` - logs draft → pending transition
+  - [✅] `approve_sow()` - logs pending → approved/rejected
+- [✅] Add audit logging to financial operations:
+  - [✅] `create_client()` - logs client creation
+  - [✅] `update_client()` - logs updates with old/new values
+  - [✅] `delete_client()` - logs deactivation
+- **Files**: `app/utils/audit.py`, `app/services/sow_service.py`, `app/services/client_service.py`, `app/routers/clients.py`, `tests/test_audit.py`
+- **Validation**: 
+  - All 94 tests passing ✅
+  - Audit utility functions tested ✅
+  - Client and SOW service methods create audit logs ✅
+  - Code coverage at 63.98% (with untested models/invoice/project/timesheet at 0%)
+- **Note**: Audit logs created for all state transitions and financial operations
 
 ### Week 3-4: Project & Timesheet Management
 

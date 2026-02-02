@@ -1,6 +1,6 @@
 """Clients router."""
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -75,7 +75,7 @@ async def create_client(
 
     service = ClientService()
     try:
-        client = await service.create_client(session, client_data)
+        client = await service.create_client(session, client_data, current_user.user_id)
         await session.commit()
         await session.refresh(client)
         return ClientResponse.model_validate(client)
@@ -107,7 +107,7 @@ async def list_clients(
     current_user: Annotated[TokenData, Depends(get_current_active_user)],
     skip: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-    is_active: Optional[bool] = Query(None),
+    is_active: bool | None = Query(None),
 ) -> ClientList:
     """List all clients.
 
@@ -214,7 +214,7 @@ async def update_client(
 
     service = ClientService()
     try:
-        client = await service.update_client(session, client_id, client_data)
+        client = await service.update_client(session, client_id, client_data, current_user.user_id)
 
         if not client:
             await session.rollback()
@@ -275,7 +275,7 @@ async def delete_client(
 
     service = ClientService()
     try:
-        client = await service.delete_client(session, client_id)
+        client = await service.delete_client(session, client_id, current_user.user_id)
 
         if not client:
             await session.rollback()

@@ -1,25 +1,26 @@
 """Client service for managing client records."""
 
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import Client
 from app.models.client import ClientCreate, ClientUpdate
+from app.utils.audit import log_audit
 
 
 class ClientService:
     """Service for client management operations."""
 
     async def create_client(
-        self, session: AsyncSession, client_data: ClientCreate
+        self, session: AsyncSession, client_data: ClientCreate, created_by: int
     ) -> Client:
         """Create a new client.
 
         Args:
             session: Database session
             client_data: Client creation data
+            created_by: ID of user creating the client
 
         Returns:
             Client: Created client object
@@ -37,11 +38,28 @@ class ClientService:
         client = Client(**client_data.model_dump())
         session.add(client)
         await session.flush()
+        await session.refresh(client)
+
+        # Log audit entry
+        await log_audit(
+            session=session,
+            user_id=created_by,
+            action="create",
+            entity_type="client",
+            entity_id=client.id,
+            new_values={
+                "name": client.name,
+                "email": client.email,
+                "company": client.company,
+            },
+            description=f"Client '{client.name}' created",
+        )
+
         return client
 
     async def get_client(
         self, session: AsyncSession, client_id: int
-    ) -> Optional[Client]:
+    ) -> Client | None:
         """Get a client by ID.
 
         Args:
@@ -56,7 +74,7 @@ class ClientService:
 
     async def get_client_by_email(
         self, session: AsyncSession, email: str
-    ) -> Optional[Client]:
+    ) -> Client | None:
         """Get a client by email address.
 
         Args:
@@ -74,7 +92,7 @@ class ClientService:
         session: AsyncSession,
         skip: int = 0,
         limit: int = 100,
-        is_active: Optional[bool] = None,
+        is_active: bool | None = None,
     ) -> tuple[list[Client], int]:
         """List all clients with optional filtering.
 
@@ -105,14 +123,15 @@ class ClientService:
         return result.scalars().all(), total
 
     async def update_client(
-        self, session: AsyncSession, client_id: int, client_data: ClientUpdate
-    ) -> Optional[Client]:
+        self, session: AsyncSession, client_id: int, client_data: ClientUpdate, updated_by: int
+    ) -> Client | None:
         """Update a client.
 
         Args:
             session: Database session
             client_id: Client ID
             client_data: Client update data
+            updated_by: ID of user updating the client
 
         Returns:
             Optional[Client]: Updated client object if found, None otherwise
@@ -132,22 +151,40 @@ class ClientService:
                     f"Client with email {client_data.email} already exists"
                 )
 
-        # Update only provided fields
+        # Capture old values before update
         update_data = client_data.model_dump(exclude_unset=True)
+        old_values = {key: getattr(client, key, None) for key in update_data.keys()}
+
+        # Update only provided fields
         for key, value in update_data.items():
             setattr(client, key, value)
 
         await session.flush()
+        await session.refresh(client)
+
+        # Log audit entry
+        await log_audit(
+            session=session,
+            user_id=updated_by,
+            action="update",
+            entity_type="client",
+            entity_id=client.id,
+            old_values=old_values,
+            new_values=update_data,
+            description=f"Client '{client.name}' updated",
+        )
+
         return client
 
     async def delete_client(
-        self, session: AsyncSession, client_id: int
-    ) -> Optional[Client]:
+        self, session: AsyncSession, client_id: int, deleted_by: int
+    ) -> Client | None:
         """Delete (deactivate) a client.
 
         Args:
             session: Database session
             client_id: Client ID
+            deleted_by: ID of user deleting the client
 
         Returns:
             Optional[Client]: Deleted client object if found, None otherwise
@@ -158,4 +195,18 @@ class ClientService:
 
         client.is_active = False
         await session.flush()
+        await session.refresh(client)
+
+        # Log audit entry
+        await log_audit(
+            session=session,
+            user_id=deleted_by,
+            action="delete",
+            entity_type="client",
+            entity_id=client.id,
+            old_values={"is_active": True},
+            new_values={"is_active": False},
+            description=f"Client '{client.name}' deactivated",
+        )
+
         return client

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import SOW
 from app.models.sow import SOWApprove, SOWCreate, SOWUpdate
+from app.utils.audit import log_audit
 
 
 class SOWService:
@@ -48,6 +49,23 @@ class SOWService:
         session.add(sow)
         await session.flush()
         await session.refresh(sow)
+
+        # Log audit entry
+        await log_audit(
+            session=session,
+            user_id=created_by,
+            action="create",
+            entity_type="sow",
+            entity_id=sow.id,
+            new_values={
+                "status": sow.status,
+                "client_id": sow.client_id,
+                "title": sow.title,
+                "total_budget": str(sow.total_budget),
+            },
+            description=f"SOW '{sow.title}' created in draft status",
+        )
+
         return sow
 
     async def get_sow(self, session: AsyncSession, sow_id: int) -> SOW | None:
@@ -162,9 +180,23 @@ class SOWService:
                 f"Cannot submit SOW with status '{sow.status}'. Only draft SOWs can be submitted."
             )
 
+        old_status = sow.status
         sow.status = "pending"
         await session.flush()
         await session.refresh(sow)
+
+        # Log audit entry
+        await log_audit(
+            session=session,
+            user_id=sow.created_by,  # Assuming creator submits
+            action="submit",
+            entity_type="sow",
+            entity_id=sow.id,
+            old_values={"status": old_status},
+            new_values={"status": "pending"},
+            description=f"SOW '{sow.title}' submitted for approval",
+        )
+
         return sow
 
     async def approve_sow(
@@ -198,12 +230,32 @@ class SOWService:
             )
 
         # Update status based on approval decision
-        sow.status = "approved" if approval_data.approved else "rejected"
+        old_status = sow.status
+        new_status = "approved" if approval_data.approved else "rejected"
+        sow.status = new_status
         sow.approved_by = approved_by
         sow.approved_at = datetime.now(timezone.utc)
 
         await session.flush()
         await session.refresh(sow)
+
+        # Log audit entry
+        action = "approve" if approval_data.approved else "reject"
+        await log_audit(
+            session=session,
+            user_id=approved_by,
+            action=action,
+            entity_type="sow",
+            entity_id=sow.id,
+            old_values={"status": old_status},
+            new_values={
+                "status": new_status,
+                "approved_by": approved_by,
+                "approved_at": sow.approved_at.isoformat(),
+            },
+            description=f"SOW '{sow.title}' {new_status} by user {approved_by}",
+        )
+
         return sow
 
     async def reject_sow(
