@@ -1,12 +1,14 @@
 """Main FastAPI application entry point."""
 
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -91,6 +93,29 @@ app.include_router(projects.router, tags=["Projects"])
 app.include_router(timesheets.router, tags=["Timesheets"])
 app.include_router(invoices.router, tags=["Invoices"])
 app.include_router(reports.router, tags=["Reports"])
+
+
+# Mount static files for frontend
+static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+# SPA root route - serve index.html for root path
+@app.get("/", include_in_schema=False)
+async def serve_spa_root():
+    """Serve the React SPA from root path."""
+    index_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path, media_type="text/html")
+    # Fallback if index.html doesn't exist yet
+    return JSONResponse(
+        {
+            "message": "Votra.io API",
+            "version": "0.1.0",
+            "status": "running",
+        }
+    )
 
 
 # Global exception handler
