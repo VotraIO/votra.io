@@ -20,19 +20,19 @@
 - **Files**: `alembic/`, `alembic.ini`, `alembic/env.py`
 - **Validation**: Migration creates users table in database
 
-**[ ] Task 1.2: Define SQLAlchemy ORM Models**
-- [ ] Create `app/database/models.py`
-- [ ] Implement User model with fields: id, email, username, hashed_password, full_name, role, is_active, created_at
-- [ ] Implement Client model with fields: id, name, email, phone, company, billing_address, payment_terms, is_active, created_at
-- [ ] Implement SOW model with fields: id, client_id, title, description, start_date, end_date, rate, total_budget, status, created_by, approved_by, approved_at, created_at, updated_at
-- [ ] Implement Project model with fields: id, sow_id, name, description, status, start_date, end_date, budget, created_by, created_at, updated_at
-- [ ] Implement Timesheet model with fields: id, project_id, consultant_id, work_date, hours_logged, billing_rate, billable_amount, is_billable, notes, status, submitted_at, approved_by, approved_at, created_at, updated_at
-- [ ] Implement Invoice model with fields: id, client_id, project_id, invoice_number, invoice_date, due_date, subtotal, tax_amount, discount_amount, total_amount, status, payment_date, created_at, updated_at
-- [ ] Implement LineItem model with fields: id, invoice_id, description, quantity, unit_price, line_total
-- [ ] Implement AuditLog model with fields: id, user_id, action, entity_type, entity_id, old_values, new_values, description, created_at
-- [ ] Add relationships between models
-- [ ] Add constraints (foreign keys, unique constraints)
-- [ ] Add indexes for performance
+**[x] Task 1.2: Define SQLAlchemy ORM Models**
+- [x] Create `app/database/models.py`
+- [x] Implement User model with fields: id, email, username, hashed_password, full_name, role, is_active, created_at
+- [x] Implement Client model with fields: id, name, email, phone, company, billing_address, payment_terms, is_active, created_at
+- [x] Implement SOW model with fields: id, client_id, title, description, start_date, end_date, rate, total_budget, status, created_by, approved_by, approved_at, created_at, updated_at
+- [x] Implement Project model with fields: id, sow_id, name, description, status, start_date, end_date, budget, created_by, created_at, updated_at
+- [x] Implement Timesheet model with fields: id, project_id, consultant_id, work_date, hours_logged, billing_rate, billable_amount, is_billable, notes, status, submitted_at, approved_by, approved_at, created_at, updated_at
+- [x] Implement Invoice model with fields: id, client_id, project_id, invoice_number, invoice_date, due_date, subtotal, tax_amount, discount_amount, total_amount, status, payment_date, created_at, updated_at
+- [x] Implement LineItem model with fields: id, invoice_id, description, quantity, unit_price, line_total
+- [x] Implement AuditLog model with fields: id, user_id, action, entity_type, entity_id, old_values, new_values, description, created_at
+- [x] Add relationships between models
+- [x] Add constraints (foreign keys, unique constraints)
+- [x] Add indexes for performance
 - **Files**: `app/database/models.py`
 - **Validation**: `python -c "from app.database.models import *; print('All models imported successfully')"`
 
