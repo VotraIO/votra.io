@@ -11,8 +11,9 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
+from app.database.base import Base, engine
 from app.limiter import limiter
-from app.routers import auth, health, users
+from app.routers import auth, clients, health, users
 
 settings = get_settings()
 
@@ -22,7 +23,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Handle application lifespan events."""
     # Startup
     print("Starting up Votra.io API...")
-    # Initialize database, cache, etc. here
+    # Initialize database tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
     # Shutdown
     print("Shutting down Votra.io API...")
@@ -82,6 +85,7 @@ async def add_security_headers(request, call_next):
 app.include_router(health.router, tags=["Health"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
+app.include_router(clients.router, tags=["Clients"])
 
 
 # Global exception handler
