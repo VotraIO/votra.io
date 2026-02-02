@@ -2,7 +2,6 @@
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -12,7 +11,7 @@ class SOWBase(BaseModel):
 
     client_id: int = Field(..., gt=0)
     title: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=5000)
+    description: str | None = Field(None, max_length=5000)
     start_date: date
     end_date: date
     rate: Decimal = Field(..., gt=0, decimal_places=2)
@@ -35,10 +34,10 @@ class SOWCreate(SOWBase):
 class SOWUpdate(BaseModel):
     """SOW update request model."""
 
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=5000)
-    rate: Optional[Decimal] = Field(None, gt=0, decimal_places=2)
-    total_budget: Optional[Decimal] = Field(None, gt=0, decimal_places=2)
+    title: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = Field(None, max_length=5000)
+    rate: Decimal | None = Field(None, gt=0, decimal_places=2)
+    total_budget: Decimal | None = Field(None, gt=0, decimal_places=2)
 
 
 class SOWResponse(SOWBase):
@@ -49,8 +48,8 @@ class SOWResponse(SOWBase):
     id: int
     status: str
     created_by: int
-    approved_by: Optional[int] = None
-    approved_at: Optional[datetime] = None
+    approved_by: int | None = None
+    approved_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -59,7 +58,7 @@ class SOWApprove(BaseModel):
     """SOW approval request model."""
 
     approved: bool = Field(..., description="Whether the SOW is approved")
-    notes: Optional[str] = Field(None, max_length=2000)
+    notes: str | None = Field(None, max_length=2000)
 
 
 class SOWList(BaseModel):

@@ -3,13 +3,11 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
+from app.limiter import limiter
 from app.models.common import HealthResponse
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.get(
@@ -22,7 +20,7 @@ limiter = Limiter(key_func=get_remote_address)
 @limiter.limit("10/minute")
 async def health_check(request: Request) -> HealthResponse:
     """Health check endpoint.
-    
+
     Returns:
         HealthResponse: API health status
     """
@@ -42,7 +40,7 @@ async def health_check(request: Request) -> HealthResponse:
 )
 async def root() -> dict:
     """Root endpoint with API information.
-    
+
     Returns:
         dict: API information
     """

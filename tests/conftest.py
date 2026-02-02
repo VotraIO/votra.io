@@ -1,6 +1,7 @@
 """Pytest configuration and fixtures."""
 
 import os
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -13,16 +14,11 @@ os.environ["RATE_LIMIT_PER_MINUTE"] = "10000"  # High limit for testing
 
 from app.main import app
 
-# Disable rate limiting for tests if supported by the limiter implementation
-limiter = getattr(app.state, "limiter", None)
-if limiter is not None and hasattr(limiter, "enabled"):
-    limiter.enabled = False
-
 
 @pytest.fixture
 def client():
     """Create a test client for the FastAPI application.
-    
+
     Yields:
         TestClient: FastAPI test client
     """
@@ -33,7 +29,7 @@ def client():
 @pytest.fixture
 def auth_headers():
     """Create authentication headers for testing protected endpoints.
-    
+
     Returns:
         dict: Headers with Bearer token
     """
@@ -45,7 +41,7 @@ def auth_headers():
 @pytest.fixture
 def mock_user():
     """Create a mock user for testing.
-    
+
     Returns:
         dict: Mock user data
     """

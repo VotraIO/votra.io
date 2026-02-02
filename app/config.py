@@ -1,7 +1,6 @@
 """Application configuration using Pydantic Settings."""
 
 from functools import lru_cache
-from typing import List
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -41,13 +40,13 @@ class Settings(BaseSettings):
     )
 
     # CORS
-    cors_origins: List[str] = Field(
+    cors_origins: list[str] = Field(
         default=["http://localhost:3000", "http://localhost:8000"],
         description="Allowed CORS origins",
     )
 
     # Trusted hosts
-    allowed_hosts: List[str] = Field(
+    allowed_hosts: list[str] = Field(
         default=["localhost", "127.0.0.1", "*.votra.io"],
         description="Allowed host headers",
     )
@@ -83,10 +82,10 @@ class Settings(BaseSettings):
         return v
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """Get cached settings instance.
-    
+
     Returns:
         Settings: Application settings singleton
     """

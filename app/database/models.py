@@ -1,6 +1,6 @@
 """Database models (SQLAlchemy ORM)."""
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
@@ -31,9 +31,9 @@ class User(Base):
     role = Column(String(50), default="consultant", nullable=False, index=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(
-        DateTime(timezone=True), 
-        default=lambda: datetime.now(timezone.utc), 
-        nullable=False
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
     )
     updated_at = Column(
         DateTime(timezone=True),
@@ -147,9 +147,15 @@ class SOW(Base):
     )
 
     client = relationship("Client", back_populates="sows")
-    creator = relationship("User", back_populates="created_sows", foreign_keys=[created_by])
-    approver = relationship("User", back_populates="approved_sows", foreign_keys=[approved_by])
-    projects = relationship("Project", back_populates="sow", cascade="all, delete-orphan")
+    creator = relationship(
+        "User", back_populates="created_sows", foreign_keys=[created_by]
+    )
+    approver = relationship(
+        "User", back_populates="approved_sows", foreign_keys=[approved_by]
+    )
+    projects = relationship(
+        "Project", back_populates="sow", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         """String representation of SOW."""
@@ -183,7 +189,9 @@ class Project(Base):
     )
 
     sow = relationship("SOW", back_populates="projects")
-    creator = relationship("User", back_populates="created_projects", foreign_keys=[created_by])
+    creator = relationship(
+        "User", back_populates="created_projects", foreign_keys=[created_by]
+    )
     timesheets = relationship(
         "Timesheet", back_populates="project", cascade="all, delete-orphan"
     )

@@ -1,6 +1,6 @@
 """Database configuration and session management."""
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -31,15 +31,18 @@ AsyncSessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
 )
+
+
 # Create base class for declarative models
 class Base(DeclarativeBase):
     """Base class for all database models."""
+
     pass
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Get database session.
-    
+
     Yields:
         AsyncSession: Database session
     """

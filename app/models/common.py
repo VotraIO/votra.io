@@ -1,6 +1,5 @@
 """Common Pydantic models."""
 
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -9,14 +8,14 @@ class ErrorResponse(BaseModel):
     """Standard error response model."""
 
     detail: str = Field(..., description="Error message")
-    error_code: Optional[str] = Field(None, description="Error code")
+    error_code: str | None = Field(None, description="Error code")
 
 
 class SuccessResponse(BaseModel):
     """Standard success response model."""
 
     message: str = Field(..., description="Success message")
-    data: Optional[dict] = Field(None, description="Response data")
+    data: dict | None = Field(None, description="Response data")
 
 
 class HealthResponse(BaseModel):

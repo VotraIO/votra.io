@@ -1,17 +1,17 @@
 """Main FastAPI application entry point."""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 from app.config import get_settings
+from app.limiter import limiter
 from app.routers import auth, health, users
 
 settings = get_settings()
@@ -29,9 +29,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Cleanup resources here
 
 
-# Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address)
-
 # Create FastAPI application
 app = FastAPI(
     title=settings.app_name,
@@ -42,9 +39,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Add rate limiting middleware
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Add rate limiting middleware only if not in test environment
+if settings.environment != "test":
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+else:
+    app.state.limiter = limiter
 
 # Add CORS middleware
 app.add_middleware(
@@ -71,7 +71,9 @@ async def add_security_headers(request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=31536000; includeSubDomains"
+    )
     response.headers["Content-Security-Policy"] = "default-src 'self'"
     return response
 
@@ -90,9 +92,7 @@ async def global_exception_handler(request, exc):
     print(f"Unexpected error: {exc}")
     return JSONResponse(
         status_code=500,
-        content={
-            "detail": "Internal server error" if not settings.debug else str(exc)
-        },
+        content={"detail": "Internal server error" if not settings.debug else str(exc)},
     )
 
 

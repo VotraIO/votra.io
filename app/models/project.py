@@ -2,7 +2,6 @@
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -12,7 +11,7 @@ class ProjectBase(BaseModel):
 
     sow_id: int = Field(..., gt=0)
     name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=5000)
+    description: str | None = Field(None, max_length=5000)
     status: str = Field(..., min_length=1, max_length=50)
     start_date: date
     end_date: date
@@ -35,11 +34,11 @@ class ProjectCreate(ProjectBase):
 class ProjectUpdate(BaseModel):
     """Project update request model."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=5000)
-    status: Optional[str] = Field(None, min_length=1, max_length=50)
-    end_date: Optional[date] = None
-    budget: Optional[Decimal] = Field(None, gt=0, decimal_places=2)
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = Field(None, max_length=5000)
+    status: str | None = Field(None, min_length=1, max_length=50)
+    end_date: date | None = None
+    budget: Decimal | None = Field(None, gt=0, decimal_places=2)
 
 
 class ProjectResponse(ProjectBase):

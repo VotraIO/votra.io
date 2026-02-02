@@ -1,7 +1,6 @@
 """Client-related Pydantic models."""
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -11,9 +10,9 @@ class ClientBase(BaseModel):
 
     name: str = Field(..., min_length=1, max_length=255)
     email: EmailStr = Field(..., description="Client email address")
-    phone: Optional[str] = Field(None, max_length=50)
-    company: Optional[str] = Field(None, max_length=255)
-    billing_address: Optional[str] = Field(None, max_length=2000)
+    phone: str | None = Field(None, max_length=50)
+    company: str | None = Field(None, max_length=255)
+    billing_address: str | None = Field(None, max_length=2000)
     payment_terms: int = Field(default=30, ge=0, le=365)
     is_active: bool = Field(default=True)
 
@@ -25,13 +24,13 @@ class ClientCreate(ClientBase):
 class ClientUpdate(BaseModel):
     """Client update request model."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = Field(None, max_length=50)
-    company: Optional[str] = Field(None, max_length=255)
-    billing_address: Optional[str] = Field(None, max_length=2000)
-    payment_terms: Optional[int] = Field(None, ge=0, le=365)
-    is_active: Optional[bool] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    email: EmailStr | None = None
+    phone: str | None = Field(None, max_length=50)
+    company: str | None = Field(None, max_length=255)
+    billing_address: str | None = Field(None, max_length=2000)
+    payment_terms: int | None = Field(None, ge=0, le=365)
+    is_active: bool | None = None
 
 
 class ClientResponse(ClientBase):

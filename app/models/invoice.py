@@ -2,7 +2,6 @@
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -11,7 +10,7 @@ class InvoiceBase(BaseModel):
     """Base invoice model with common fields."""
 
     client_id: int = Field(..., gt=0)
-    project_id: Optional[int] = Field(None, gt=0)
+    project_id: int | None = Field(None, gt=0)
     invoice_number: str = Field(..., min_length=1, max_length=50)
     invoice_date: date
     due_date: date
@@ -20,7 +19,7 @@ class InvoiceBase(BaseModel):
     discount_amount: Decimal = Field(default=0, ge=0, decimal_places=2)
     total_amount: Decimal = Field(..., ge=0, decimal_places=2)
     status: str = Field(..., min_length=1, max_length=50)
-    payment_date: Optional[date] = None
+    payment_date: date | None = None
 
     @field_validator("due_date")
     @classmethod

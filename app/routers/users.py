@@ -1,17 +1,14 @@
 """Users router."""
 
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 from app.dependencies import get_current_active_user
+from app.limiter import limiter
 from app.models.user import TokenData, UserCreate, UserResponse
 from app.services.user_service import UserService
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post(
@@ -24,18 +21,18 @@ limiter = Limiter(key_func=get_remote_address)
 @limiter.limit("3/hour")
 async def register_user(request: Request, user: UserCreate) -> UserResponse:
     """Register a new user.
-    
+
     Args:
         user: User creation data
-        
+
     Returns:
         UserResponse: Created user information
-        
+
     Raises:
         HTTPException: If user already exists or validation fails
     """
     user_service = UserService()
-    
+
     # Check if user already exists
     existing_user = await user_service.get_user_by_username(user.username)
     if existing_user:
@@ -43,14 +40,14 @@ async def register_user(request: Request, user: UserCreate) -> UserResponse:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    
+
     existing_email = await user_service.get_user_by_email(user.email)
     if existing_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",
         )
-    
+
     # Create user
     created_user = await user_service.create_user(user)
     return created_user
@@ -69,31 +66,31 @@ async def get_current_user_info(
     current_user: TokenData = Depends(get_current_active_user),
 ) -> UserResponse:
     """Get current user information.
-    
+
     Args:
         current_user: Current authenticated user from token
-        
+
     Returns:
         UserResponse: Current user information
-        
+
     Raises:
         HTTPException: If user not found
     """
     user_service = UserService()
     user = await user_service.get_user_by_username(str(current_user.username))
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return user
 
 
 @router.get(
     "/",
-    response_model=List[UserResponse],
+    response_model=list[UserResponse],
     status_code=status.HTTP_200_OK,
     summary="List Users",
     description="Get a list of all users (requires authentication)",
@@ -104,14 +101,14 @@ async def list_users(
     current_user: TokenData = Depends(get_current_active_user),
     skip: int = 0,
     limit: int = 100,
-) -> List[UserResponse]:
+) -> list[UserResponse]:
     """Get list of all users.
-    
+
     Args:
         current_user: Current authenticated user
         skip: Number of users to skip (pagination)
         limit: Maximum number of users to return
-        
+
     Returns:
         List[UserResponse]: List of users
     """
@@ -134,24 +131,24 @@ async def get_user(
     current_user: TokenData = Depends(get_current_active_user),
 ) -> UserResponse:
     """Get user by username.
-    
+
     Args:
         username: Username to look up
         current_user: Current authenticated user
-        
+
     Returns:
         UserResponse: User information
-        
+
     Raises:
         HTTPException: If user not found
     """
     user_service = UserService()
     user = await user_service.get_user_by_username(username)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
-    
+
     return user
