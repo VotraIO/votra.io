@@ -2,9 +2,11 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.engine import make_url
 
 from alembic import context
 
+from app.config import get_settings
 from app.database.base import Base  # Import your Base metadata
 
 # this is the Alembic Config object, which provides
@@ -21,6 +23,20 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+
+def _get_sync_database_url() -> str:
+    """Return a sync database URL for Alembic migrations."""
+    settings = get_settings()
+    url = make_url(settings.database_url)
+    if url.drivername == "sqlite+aiosqlite":
+        url = url.set(drivername="sqlite")
+    elif url.drivername == "postgresql+asyncpg":
+        url = url.set(drivername="postgresql")
+    return str(url)
+
+
+config.set_main_option("sqlalchemy.url", _get_sync_database_url())
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
