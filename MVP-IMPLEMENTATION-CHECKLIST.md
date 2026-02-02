@@ -12,9 +12,9 @@
 ### Week 1: Database & ORM
 
 **[ ] Task 1.1: Initialize Alembic Migrations**
-- [ ] Install alembic: `pip install alembic`
-- [ ] Initialize: `alembic init alembic`
-- [ ] Create `alembic.ini` with database URL
+- [x] Install alembic: `pip install alembic`
+- [x] Initialize: `alembic init alembic`
+- [x] Create `alembic.ini` with database URL
 - [ ] Create initial migration with User model
 - [ ] Test migration: `alembic upgrade head`
 - **Files**: `alembic/`, `alembic.ini`, `alembic/env.py`
