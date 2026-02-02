@@ -28,9 +28,8 @@ The Votra.io platform is a comprehensive consulting business portal built on a l
 ┌─────────────────────────────────────────────────────────────────┐
 │                      User Layer                                  │
 ├─────────────────────────────────────────────────────────────────┤
-│  Web Dashboard (Vue.js)  │  Mobile App  │  API Clients          │
-│  Project Managers       │  Consultants │  Integrations         │
-│  Accountants            │  Clients     │  Reports              │
+│  Web Dashboard (Vue.js)  │  CLI Tool  │  IDE Extension          │
+│  Browser-based UI        │  Command   │  Native editor           │
 └──────────────┬────────────────────────┬──────────────────────────┘
                │                        │
                └──────────┬─────────────┘
@@ -44,34 +43,12 @@ The Votra.io platform is a comprehensive consulting business portal built on a l
                │                        │
                │ Internal APIs          │
 ┌──────────────────────────────────────────────────────────────────┐
-│                Core Services Layer (Consulting Domain)           │
-├──────────────┬──────────────────┬──────────────────────────────┤
-│ Auth Service │  Client Service  │  SOW Service               │
-│ User mgmt    │  Profiles        │  Creation & approval       │
-│ Token mgmt   │  Contact tracking│  Scope management          │
-├──────────────┼──────────────────┼──────────────────────────────┤
-│ Project      │  Timesheet       │  Invoice Service           │
-│ Service      │  Service         │  Generation                │
-│ Tracking     │  Entry & tracking│  Payment processing        │
-│ Resources    │  Validation      │  Reporting                 │
-└──────┬───────┴──────────┬───────┴──────────────┬────────────┘
-       │                  │                      │
-       │ Async Events     │                      │
-┌──────────────────────────────────────────────────────────────────┐
-│            Consulting Domain Validation Layer                    │
-├──────────────────────────────────────────────────────────────────┤
-│  SOW Approval Workflow │ Billing Validation │ Audit Logging    │
-│  Rate Validation       │ Double-Bill Prevention │ Compliance   │
-└──────────────────────────────────────────────────────────────────┘
-       │                  │                      │
-       ├──────┬───────────┼─────────────┬───────┤
-       │      │           │             │       │
-┌──────────────────────────────────────────────────────────────────┐
-│                      Database Layer                              │
-├──────────────────────────────────────────────────────────────────┤
-│  Client   │  SOW  │  Project  │  Resource  │  Timesheet        │
-│  Invoice  │  LineItem  │  PaymentTerm  │  User  │  Audit Logs  │
-└──────────────────────────────────────────────────────────────────┘
+│                Core Services Layer                               │
+├──────────────┬─────────────────────┬────────────────────────────┤
+│ Auth Service │  Client/SOW Service │  Timesheet/Invoice Service │
+│ User mgmt    │  Client & SOW mgmt  │  Time entry & approvals    │
+│ Token mgmt   │  Engagement tracking│  Billing & invoicing       │
+└──────┬───────┴──────────┬───────────┴──────────────┬────────────┘
        │                  │                          │
        │ Async Events     │                          │
 ┌──────────────────────────────────────────────────────────────────┐
