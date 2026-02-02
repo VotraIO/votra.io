@@ -225,19 +225,24 @@
 
 ### Week 3-4: Project & Timesheet Management
 
-**[ ] Task 4.1: Create Project Router**
-- [ ] Create `app/routers/projects.py`:
-  - [ ] POST `/api/v1/projects` - Create project from approved SOW
-  - [ ] GET `/api/v1/projects` - List projects with filtering
-  - [ ] GET `/api/v1/projects/{id}` - Get project detail
-  - [ ] PUT `/api/v1/projects/{id}` - Update project (limited fields)
-  - [ ] POST `/api/v1/projects/{id}/close` - Close project
-- [ ] Create `app/services/project_service.py`:
-  - [ ] `create_project_from_sow()` - Validate SOW approved, create project
-  - [ ] `get_project_summary()` - Total hours, billable amount, status
-- [ ] RBAC: pm only can create/modify
+**[x] Task 4.1: Create Project Router** ✅ COMPLETE
+- [x] Create `app/routers/projects.py`:
+  - [x] POST `/api/v1/projects` - Create project from approved SOW
+  - [x] GET `/api/v1/projects` - List projects with filtering
+  - [x] GET `/api/v1/projects/{id}` - Get project detail
+  - [x] PUT `/api/v1/projects/{id}` - Update project (limited fields)
+  - [x] POST `/api/v1/projects/{id}/close` - Close project
+  - [x] GET `/api/v1/projects/{id}/summary` - Billing summary with calculations
+- [x] Create `app/services/project_service.py`:
+  - [x] `create_project_from_sow()` - Validate SOW approved, create project
+  - [x] `get_project_summary()` - Total hours, billable amount, status
+  - [x] `list_projects()` - Paginated list with status filtering
+  - [x] `update_project()` - Update description only
+  - [x] `close_project()` - Change status to closed
+- [x] RBAC: pm/admin can create/modify, admin only for close
+- [x] Audit logging on all operations
 - **Files**: `app/routers/projects.py`, `app/services/project_service.py`
-- **Validation**: `pytest tests/test_projects.py -v`
+- **Validation**: All 17 tests passing ✅
 
 **[ ] Task 4.2: Create Timesheet Router & Service**
 - [ ] Create `app/services/timesheet_service.py`:
