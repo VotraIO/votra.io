@@ -1,103 +1,99 @@
-# FastAPI Custom Agent Implementation Summary
+# Consulting Business Portal Implementation Summary
 
 ## What Was Created
 
-A comprehensive custom agent system for FastAPI development with security, testing, and CI/CD automation has been successfully implemented for the Votra.io project.
+A comprehensive consulting and IT business portal system for Votra.io has been successfully designed. The platform provides complete workflow management from client engagement through project completion and invoicing.
 
-## Custom Agent: FastAPI Security Developer
+## Consulting Portal System: FastAPI Security Developer
 
 ### Location
 `.github/agents/fastapi-security-dev.md`
 
-### Key Features
+### Key Features for Consulting Workflows
 
-#### 1. **Security-First Development**
-- OWASP Top 10 compliance guidelines
-- JWT authentication patterns
-- Password hashing with bcrypt
-- Input validation with Pydantic
-- SQL injection prevention
-- XSS and CSRF protection
-- Rate limiting implementation
-- Security headers configuration
-- Dependency vulnerability scanning (bandit, safety)
+#### 1. **Consulting Workflow Architecture**
+- Client management and contact tracking
+- SOW (Statement of Work) creation with approval workflows
+- Project tracking with milestone and deliverable management
+- Timesheet management with billable hour tracking
+- Automated invoice generation from approved timesheets
+- Real-time reporting and profitability analysis
 
-#### 2. **Comprehensive Testing**
-- Pytest framework with pytest-cov
-- 80% code coverage target (configurable)
-- Security test cases
-- Edge case and error handling tests
-- Async test support with pytest-asyncio
-- Mock external dependencies
-- Automated coverage reporting
+#### 2. **Business Logic Services**
+- Client service: Manage client profiles, engagement history, contact information
+- SOW service: Create, approve, reject, and track SOWs with version control
+- Project service: Track projects, allocate resources, manage milestones
+- Timesheet service: Validate and track billable hours, prevent double-billing
+- Invoice service: Generate invoices from timesheets, calculate totals, track payments
+- Reporting service: Generate consulting metrics, utilization reports, profitability analysis
 
-#### 3. **Code Quality Enforcement**
-- **Formatting**: black (88 char line length) + isort
-- **Linting**: ruff (fast, comprehensive) + pylint
-- **Type Checking**: mypy with strict configuration
-- **Pre-commit Hooks**: Automated checks before commit
-- PEP 8 compliance
-- Docstring requirements
+#### 3. **Data Models & Validation**
+- Client models with company and contact information
+- SOW models with scope, rates, terms, and approval status
+- Project models with milestones and deliverables
+- Timesheet models with hour validation and rate integration
+- Invoice models with line items and payment tracking
+- Business logic validation:
+  - Rate validation (no negative/zero rates)
+  - Date range validation for projects and timesheets
+  - No double-billing prevention
+  - SOW approval workflow enforcement
 
-#### 4. **CI/CD Automation**
-Three GitHub Actions workflows configured:
+## How to Use the Consulting Portal
 
-**test.yml** - Continuous Testing
-- Runs on Python 3.10, 3.11, 3.12
-- Executes full test suite with coverage
-- Uploads coverage to Codecov
-- Fails if coverage < 80%
+### Basic Consulting Workflow
 
-**lint.yml** - Code Quality
-- Checks formatting with black and isort
-- Runs ruff linting
-- Performs type checking with mypy
-- Runs pylint for additional checks
-
-**security.yml** - Security Scanning
-- Scans code with bandit
-- Checks dependencies with safety
-- Runs CodeQL analysis
-- Scheduled weekly scans
-
-#### 5. **Secrets Management**
-- GitHub secrets integration
-- `gh` CLI usage examples
-- Environment-based configuration
-- Pydantic Settings for config management
-- `.env.example` template provided
-
-## How to Use the Custom Agent
-
-### Basic Usage Pattern
+#### 1. Client Engagement
 ```
-@fastapi-security-dev [your request]
+@fastapi-security-dev Create client management endpoints to track client 
+profiles, contact information, and engagement history. Include company name, 
+point of contact, contract terms, and billing address.
 ```
 
-### Example Requests
-
-#### Create a New API Endpoint
+#### 2. SOW Creation & Approval
 ```
-@fastapi-security-dev Please create a POST /api/v1/users endpoint for user 
-registration. Include email validation, password hashing, duplicate email 
-check, and comprehensive tests with 85% coverage.
-```
-
-#### Implement Authentication
-```
-@fastapi-security-dev Implement JWT-based authentication with OAuth2 password 
-flow. Include login, refresh token endpoints, password hashing with bcrypt, 
-and security tests for common attack vectors.
+@fastapi-security-dev Implement SOW (Statement of Work) management with:
+- SOW creation with scope, deliverables, timeline, and rates
+- Approval workflow (pending → approved → rejected)
+- Version control and amendment tracking
+- Rate validation to prevent billing errors
 ```
 
-#### Security Review
+#### 3. Project Setup from SOW
 ```
-@fastapi-security-dev Review the authentication code in app/routers/auth.py 
-for security vulnerabilities. Check for OWASP Top 10 issues and suggest 
-improvements with tests.
+@fastapi-security-dev Create project endpoints that:
+- Generate projects from approved SOWs
+- Allocate consultants/resources to projects
+- Track milestones and deliverables
+- Link projects back to SOWs for billing purposes
 ```
 
-#### Add Database Integration
+#### 4. Timesheet Entry & Validation
+```
+@fastapi-security-dev Build timesheet management with:
+- Time entry for billable hours
+- Validation against project dates and allocated rates
+- Prevention of double-billing to same project
+- Weekly/monthly timesheet approval workflow
+```
+
+#### 5. Invoice Generation
+```
+@fastapi-security-dev Implement automated invoice generation:
+- Generate invoices from approved timesheets
+- Calculate totals based on hours × rates
+- Support multiple payment terms
+- Track invoice status (draft, sent, paid, overdue)
+```
+
+#### 6. Reporting & Analytics
+```
+@fastapi-security-dev Create reporting endpoints for:
+- Project profitability analysis
+- Consultant utilization rates
+- Revenue tracking and forecasting
+- Outstanding payment tracking
+```
 ```
 @fastapi-security-dev Add SQLAlchemy async database integration with 
 PostgreSQL. Include User model, proper indexes, and migration setup 

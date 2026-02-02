@@ -1,10 +1,18 @@
 # votra.io
 
-The website and API for dev.votra.io and www.votra.io.
+A comprehensive consulting and IT business portal for managing the complete consulting lifecycle.
 
 ## Overview
 
-This repository contains the FastAPI-based backend API and web services for Votra.io, built with security, testing, and code quality as top priorities.
+This repository contains the FastAPI-based backend API and web services for Votra.io, a consulting business portal built with security, testing, and code quality as top priorities. The platform streamlines the consulting workflow from client engagement through SOW creation, project tracking, time entry, and automated invoice generation.
+
+**Key Features**:
+- ✅ **Client Management** - Manage client profiles and engagement history
+- ✅ **SOW (Statement of Work)** - Create, track, and approve statements of work
+- ✅ **Project Tracking** - Monitor projects with resource allocation and milestones
+- ✅ **Timesheet Management** - Track consultant hours and billable time
+- ✅ **Invoice Generation** - Automated invoice creation and management
+- ✅ **Role-Based Access** - Admin, Project Manager, Consultant, Client, and Accountant roles
 
 ## Custom Agent: FastAPI Security Developer
 
@@ -14,12 +22,13 @@ This project includes a specialized custom agent for FastAPI development that en
 - ✅ **Code quality** (black, ruff, mypy, pylint)
 - ✅ **CI/CD automation** (GitHub Actions)
 - ✅ **Secrets management** (GitHub secrets, gh CLI)
+- ✅ **Consulting domain knowledge** (SOW workflow, invoice generation, timesheet validation)
 
 ### Using the Custom Agent
 
 Reference the agent in your requests:
 ```
-@fastapi-security-dev Please create a user authentication endpoint with JWT tokens
+@fastapi-security-dev Please create a new endpoint for SOW management with approval workflow
 ```
 
 See [`.github/agents/README.md`](.github/agents/README.md) for detailed usage instructions.

@@ -1,72 +1,73 @@
-# FastAPI Custom Agent Quick Reference
+# Consulting Portal Quick Reference
 
 ## Quick Start Commands
 
-### Invoke the Agent
+### Invoke the Agent for Consulting Features
 ```
-@fastapi-security-dev [your request]
+@fastapi-security-dev [your consulting workflow request]
 ```
 
 ## Common Use Cases
 
-### 1. Create New Endpoint
+### 1. Client Management
 ```
-@fastapi-security-dev Create a POST /api/v1/users endpoint for user registration.
-Include email validation, password hashing, and duplicate email check.
-```
-
-### 2. Add Authentication
-```
-@fastapi-security-dev Implement JWT-based authentication with login and refresh
-token endpoints. Include proper security headers and rate limiting.
+@fastapi-security-dev Create client management endpoints with company info, 
+contact details, billing address, and engagement history tracking.
 ```
 
-### 3. Add Tests
+### 2. SOW Management
 ```
-@fastapi-security-dev Add comprehensive tests for the auth module with at least
-85% coverage, including security test cases.
-```
-
-### 4. Security Review
-```
-@fastapi-security-dev Review app/routers/auth.py for security vulnerabilities
-and OWASP Top 10 compliance. Suggest fixes with tests.
+@fastapi-security-dev Implement SOW creation and approval workflow with scope, 
+deliverables, timeline, rates, and approval status tracking.
 ```
 
-### 5. Setup CI/CD
+### 3. Project Tracking
 ```
-@fastapi-security-dev Set up complete GitHub Actions workflows for testing,
-linting, and security scanning with 80% coverage requirement.
-```
-
-### 6. Database Integration
-```
-@fastapi-security-dev Add SQLAlchemy integration with async PostgreSQL support.
-Include models for User and Session with proper indexes.
+@fastapi-security-dev Build project management from SOWs with resource 
+allocation, milestone tracking, and deliverable management.
 ```
 
-### 7. API Documentation
+### 4. Timesheet Management
 ```
-@fastapi-security-dev Enhance the API documentation with detailed descriptions,
-examples, and security requirements for all endpoints.
+@fastapi-security-dev Create timesheet endpoints with hour entry, validation 
+against project dates/rates, and prevention of double-billing.
 ```
 
-### 8. Rate Limiting
+### 5. Invoice Generation
 ```
-@fastapi-security-dev Add rate limiting to all API endpoints with configurable
-limits based on user roles (anonymous vs authenticated).
+@fastapi-security-dev Implement automated invoice generation from timesheets 
+with calculation, payment term tracking, and payment status.
+```
+
+### 6. Reporting
+```
+@fastapi-security-dev Build consulting reports for project profitability, 
+consultant utilization, revenue tracking, and outstanding payments.
+```
+
+### 7. Audit & Compliance
+```
+@fastapi-security-dev Add audit logging for all state changes (SOW approval, 
+invoice generation) and financial compliance tracking.
+```
+
+### 8. Role-Based Access
+```
+@fastapi-security-dev Implement role-based access control for Admin, PM, 
+Consultant, Client, and Accountant roles with appropriate permissions.
 ```
 
 ## Agent Capabilities Checklist
 
-When the agent completes a task, it will ensure:
+When the agent completes a consulting task, it will ensure:
 
-- [x] Code follows FastAPI best practices
-- [x] Security best practices implemented (OWASP)
+- [x] FastAPI best practices for consulting workflows
+- [x] Security best practices (OWASP, bcrypt, JWT)
+- [x] Role-based access control implementation
+- [x] Consulting domain validation (rates, dates, billing)
 - [x] Type hints on all functions
-- [x] Pydantic models for validation
-- [x] Unit tests written and passing
-- [x] Test coverage ≥80%
+- [x] Pydantic models for all data validation
+- [x] Unit tests written and passing (85%+ coverage)
 - [x] Security tests included
 - [x] Code formatted (black, isort)
 - [x] Linting passed (ruff, pylint, mypy)
@@ -75,6 +76,9 @@ When the agent completes a task, it will ensure:
 - [x] Environment variables documented
 - [x] Error handling implemented
 - [x] Docstrings added
+- [x] Audit logging for state changes (consulting-specific)
+- [x] Financial validation rules enforced
+- [x] Compliance requirements met
 
 ## Local Development Setup
 
