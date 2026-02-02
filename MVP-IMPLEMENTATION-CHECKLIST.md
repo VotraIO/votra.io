@@ -180,24 +180,25 @@
 - **Files**: `app/routers/clients.py`
 - **Validation**: `pytest tests/test_clients.py -v`
 
-**[ ] Task 3.2: Create SOW Router & Service**
-- [ ] Create `app/services/sow_service.py` with business logic:
-  - [ ] `create_sow()` - Create SOW with validation
-  - [ ] `approve_sow()` - Approve SOW, trigger project creation
-  - [ ] `reject_sow()` - Reject SOW with reason
-  - [ ] `submit_sow()` - Submit for approval
-  - [ ] Calculate SOW total hours from timesheets (for reporting)
-- [ ] Create `app/routers/sows.py`:
-  - [ ] POST `/api/v1/sows` - Create SOW (status: draft)
-  - [ ] GET `/api/v1/sows` - List SOWs with filtering (status, client_id)
-  - [ ] GET `/api/v1/sows/{id}` - Get SOW detail
-  - [ ] PUT `/api/v1/sows/{id}` - Update SOW (only if draft)
-  - [ ] POST `/api/v1/sows/{id}/submit` - Submit for approval
-  - [ ] POST `/api/v1/sows/{id}/approve` - Approve or reject
-- [ ] Add workflow state validation (can only edit draft, can only approve pending)
-- [ ] Add audit logging for state changes
-- **Files**: `app/services/sow_service.py`, `app/routers/sows.py`
-- **Validation**: `pytest tests/test_sows.py -v`
+**[x] Task 3.2: Create SOW Router & Service** ✅ COMPLETE
+- [x] Create `app/services/sow_service.py` with business logic:
+  - [x] `create_sow()` - Create SOW with validation
+  - [x] `approve_sow()` - Approve SOW, trigger project creation
+  - [x] `reject_sow()` - Reject SOW with reason
+  - [x] `submit_sow()` - Submit for approval
+  - [x] Calculate SOW total hours from timesheets (for reporting)
+- [x] Create `app/routers/sows.py`:
+  - [x] POST `/api/v1/sows` - Create SOW (status: draft)
+  - [x] GET `/api/v1/sows` - List SOWs with filtering (status, client_id)
+  - [x] GET `/api/v1/sows/{id}` - Get SOW detail
+  - [x] PUT `/api/v1/sows/{id}` - Update SOW (only if draft)
+  - [x] POST `/api/v1/sows/{id}/submit` - Submit for approval
+  - [x] POST `/api/v1/sows/{id}/approve` - Approve or reject
+- [x] Add workflow state validation (can only edit draft, can only approve pending)
+- [x] Add audit logging for state changes
+- **Files**: `app/services/sow_service.py`, `app/routers/sows.py`, `tests/test_sows.py`
+- **Validation**: All 15 SOW tests pass ✅ | Overall: 90 tests passing
+- **Note**: Workflow states enforced: draft → pending → approved/rejected
 
 **[ ] Task 3.3: Add Audit Logging**
 - [ ] Create `app/utils/audit.py`:
