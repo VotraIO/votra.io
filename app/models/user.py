@@ -110,6 +110,9 @@ class TokenData(BaseModel):
     """Token payload data."""
 
     username: Optional[str] = None
+    role: Optional[str] = Field(None, description="User role for RBAC")
+    email: Optional[str] = Field(None, description="User email address")
+    user_id: Optional[int] = Field(None, description="User ID from database")
 
 
 class LoginRequest(BaseModel):

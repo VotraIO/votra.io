@@ -99,13 +99,13 @@
 - **Files**: `app/utils/security.py`, `app/config.py`
 - **Validation**: Tokens are created, validated, and expire correctly
 
-**[ ] Task 2.4: Add Authentication Dependencies**
-- [ ] Update `app/dependencies.py`:
-  - [ ] Add `oauth2_scheme` OAuth2PasswordBearer
-  - [ ] Add `get_current_user()` function
-  - [ ] Add `get_current_active_user()` function
-  - [ ] Add `require_role()` factory function for RBAC
-- [ ] Test dependency injection works
+**[x] Task 2.4: Add Authentication Dependencies**
+- [x] Update `app/dependencies.py`:
+  - [x] Add `oauth2_scheme` OAuth2PasswordBearer
+  - [x] Add `get_current_user()` function
+  - [x] Add `get_current_active_user()` function
+  - [x] Add `require_role()` factory function for RBAC
+- [x] Test dependency injection works
 - **Files**: `app/dependencies.py`
 - **Validation**: Auth dependencies can be injected into routers
 
