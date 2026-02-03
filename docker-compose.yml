@@ -1,0 +1,145 @@
+version: '3.9'
+
+# Docker Compose configuration for VotraIO consulting portal
+# Provides complete development and testing environment with PostgreSQL and Redis
+
+services:
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: votraio-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER:-votraio}:${DB_PASSWORD:-votraio_dev_password}@db:5432/${DB_NAME:-votraio_db}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production-32-chars-min}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app  # Hot reload for development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - votraio-network
+    restart: unless-stopped
+    # Resource limits for development
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # PostgreSQL Database - Primary data store
+  db:
+    image: postgres:15-alpine
+    container_name: votraio-postgres
+    environment:
+      - POSTGRES_USER=${DB_USER:-votraio}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-votraio_dev_password}
+      - POSTGRES_DB=${DB_NAME:-votraio_db}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=en_US.UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persist database data
+      - postgres_data:/var/lib/postgresql/data
+      # Initialize database with schema
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-votraio}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - votraio-network
+    restart: unless-stopped
+    # Security: use specific uid/gid
+    user: postgres
+    # Performance tuning for development
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "effective_cache_size=1GB"
+      - "-c"
+      - "maintenance_work_mem=64MB"
+      - "-c"
+      - "checkpoint_completion_target=0.9"
+      - "-c"
+      - "wal_buffers=16MB"
+      - "-c"
+      - "default_statistics_target=100"
+      - "-c"
+      - "work_mem=4MB"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Redis Cache - Session storage and caching
+  redis:
+    image: redis:7-alpine
+    container_name: votraio-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - votraio-network
+    restart: unless-stopped
+    # Redis persistence settings
+    command: >
+      redis-server
+      --save 60 1000
+      --appendonly yes
+      --appendfsync everysec
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+# Volumes for data persistence
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# Network configuration
+networks:
+  votraio-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

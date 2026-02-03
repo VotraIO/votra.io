@@ -1,0 +1,79 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+.venv
+ENV/
+.env.local
+.env.*.local
+
+# Testing and coverage
+tests/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+*.cover
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.env.example
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.circleci/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+docker-compose.*.yml
+
+# Documentation
+docs/
+README.md
+QUICK_REFERENCE.md
+VISUAL-GUIDE.md
+IMPLEMENTATION_SUMMARY.md
+APP_SETUP_COMPLETE.md
+DELIVERY-COMPLETE.md
+*.md
+
+# Development files
+.editorconfig
+.pre-commit-config.yaml
+requirements-dev.txt
+start.sh
+votra_io.egg-info/
+
+# Node modules (if any frontend is included)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
