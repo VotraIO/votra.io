@@ -1,0 +1,3 @@
+[submodule "helmchart"]
+	path = helmchart
+	url = https://github.com/VotraIO/votra_helmchart
