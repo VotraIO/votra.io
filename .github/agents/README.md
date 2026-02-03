@@ -235,6 +235,45 @@ token validation, expiration, and refresh scenarios.
 - ✅ Timeline planning
 - ✅ ROI and cost analysis
 
+### 8. Technical Writer (`technical-writer.md`)
+
+**Classification**: Documentation | Technical Writing | Communication
+
+**Purpose**: Technical writing specialist for creating clear, accurate, and accessible documentation.
+
+**Key Capabilities**:
+- ✅ API documentation (RESTful endpoints, request/response examples)
+- ✅ User guides and tutorials (step-by-step procedures)
+- ✅ Setup and installation guides
+- ✅ Troubleshooting guides and error documentation
+- ✅ Code examples and best practices
+- ✅ Audience-specific writing (developers, non-technical users, executives)
+- ✅ Documentation structure and organization
+- ✅ Clarity and concision improvement
+- ✅ Active voice enforcement
+- ✅ Jargon handling and explanation
+- ✅ Visual formatting and presentation
+
+**When to Use**:
+- Writing API documentation
+- Creating user guides and tutorials
+- Documenting setup and installation procedures
+- Writing troubleshooting guides
+- Improving existing documentation clarity
+- Creating end-user facing documentation
+- Writing architectural decision records (ADRs)
+- Documenting business workflows
+- Creating quick-start guides
+- Improving documentation consistency
+
+**Example Usage**:
+```
+@technical-writer Create a comprehensive API documentation for our invoicing endpoint 
+(POST /api/v1/invoices). Include request/response examples, error scenarios with 
+troubleshooting steps, usage examples in Python and cURL, and best practices for 
+invoice creation. Target audience: developers integrating with our API.
+```
+
 ## How Custom Agents Work
 
 Custom agents are specialized AI assistants with deep expertise in specific domains. Each agent is designed with:
@@ -494,12 +533,14 @@ Some agents depend on others' work:
 Advanced Planning Agent (strategic decisions)
     ├─→ Consulting Developer (implements per plan)
     ├─→ FastAPI Security Developer (implements per plan)
-    └─→ Data & Analytics (defines metrics per plan)
+    ├─→ Data & Analytics (defines metrics per plan)
+    └─→ Technical Writer (documents per plan)
 
 Security & Compliance (defines requirements)
     ├─→ Consulting Developer (implements controls)
     ├─→ FastAPI Security Developer (implements in code)
-    └─→ Testing & QA (validates compliance)
+    ├─→ Testing & QA (validates compliance)
+    └─→ Technical Writer (documents security measures)
 
 Testing & QA (validates all work)
     ├─ Consulting Developer output
@@ -510,7 +551,15 @@ Testing & QA (validates all work)
 DevOps & Infrastructure (enables deployment)
     ├─ Consulting Developer code
     ├─ FastAPI Security Developer code
-    └─ Testing & QA validation
+    ├─ Testing & QA validation
+    └─ Technical Writer documentation
+
+Technical Writer (documents all work)
+    ├─ Consulting Developer features
+    ├─ FastAPI Security Developer APIs
+    ├─ Testing & QA procedures
+    ├─ DevOps Infrastructure setup
+    └─ Data & Analytics dashboards
 ```
 
 ## Consulting Portal Agent Specializations
